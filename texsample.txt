@@ -1,0 +1,59 @@
+% !TEX encoding = UTF-8 Unicode
+\documentclass[11pt,a4paper]{jsarticle}
+\usepackage[dvipdfmx]{graphicx}
+\usepackage{ascmac}
+\usepackage{multicol}
+\usepackage{comment}
+\usepackage{listings,jlisting}
+\usepackage{bm}
+
+
+\lstset{%
+  language={C},
+  basicstyle={\small},%
+  identifierstyle={\small},%
+  commentstyle={\small\itshape},%
+  keywordstyle={\small\bfseries},%
+  ndkeywordstyle={\small},%
+  stringstyle={\small\ttfamily},
+  frame={tb},
+  breaklines=true,
+  columns=[l]{fullflexible},%
+  numbers=left,%
+  xrightmargin=0zw,%
+  xleftmargin=3zw,%
+  numberstyle={\scriptsize},%
+  stepnumber=1,
+  numbersep=1zw,%
+  lineskip=-0.5ex%
+}
+\begin{document}
+
+
+\title{}
+\author{}
+\date{締切 :  \\ 提出日 : \today}
+\maketitle
+
+\newpage
+
+
+\section{実験の目的}
+\section{実験内容}
+\subsection{プログラムの設計方針}
+
+\subsection{実装の詳細な説明}
+%\begin{eqnarray}
+%\end{eqnarray}
+\begin{lstlisting}[caption = ]
+\end{lstlisting}
+
+\subsection{テスト表示}
+\begin{center}
+  \includegraphics[scale = 0.7]{learning100.pn}
+\end{center}
+
+\subsection{工夫点}
+\subsection{問題点}
+\section{参考文献}
+\end{document}
