@@ -12,7 +12,7 @@ import numpy as np
 import cPickle
 with open("le4nn/le4MNIST_X.dump","rb") as f:
     X = cPickle.load(f)
-X = X.reshape((X.shape[0], 784))
+    X = X.reshape((X.shape[0], 784))
 
 #X, Y = mndata.load_testing()
 #X = np.array(X)
@@ -61,7 +61,7 @@ def crossEntropy(AnsY, y):
 #w2 = np.random.normal(0.0, 1.0 / M_SIZE, (CLASS_SIZE, M_SIZE))
 #b2 = np.random.normal(0.0, 1.0 / M_SIZE, (CLASS_SIZE,1))
 
-filename = 'learningtest.npz'
+filename = 'learningMSGD.npz'
 if(os.path.exists(filename)):
     load_array = np.load(filename)
     w1 = load_array["w1"]
@@ -71,8 +71,8 @@ if(os.path.exists(filename)):
     load_array.close()
 
 ##########
-i = 0
-while i < 100:
+i = 100
+while i < 200:
     inputX = X[i] / 256.0
     x, y1, y2 = forward(inputX, w1, b1, w2, b2)
     resY = recogRes(y2)

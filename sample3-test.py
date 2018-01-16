@@ -39,7 +39,7 @@ def fullyConnecterLayer(x, w, b):
 def sigmoid(x):
     sigmoid_range = 34.538776394910684
     t = np.clip(x, -sigmoid_range, sigmoid_range)
-    return 1 / (1 + np.exp(-x))
+    return 1 / (1 + np.exp(-t))
 
 def softmax(a):
     alpha = max(a)
@@ -78,7 +78,7 @@ def backOfSig(x, deltaY):
 ########## ##########
 
 
-filename = 'learningtest.npz'
+filename = 'learningAdaGrad.npz'
 if(os.path.exists(filename)):
     load_array = np.load(filename)
     w1 = load_array["w1"]
@@ -90,24 +90,26 @@ if(os.path.exists(filename)):
 
 i = 0
 precision = 0
-while i < 100 :
-    averageOfEntropy = 0
+averageOfEntropy = 0
+DATA_SIZE = 10000
+while i < DATA_SIZE :
     correct = 0
     inputX = X[i] / 256.0
     x, y1, y2 = forward(inputX, w1, b1, w2, b2)
     ansY = [0] * Y[i] + [1] + [0] * (10 - Y[i] - 1)
-    averageOfEntropy += crossEntropy(ansY, y2)
+    averageOfEntropy += crossEntropy(ansY, y2) / DATA_SIZE
     correct = correct + 1.0 if(recogRes(y2) == Y[i]) else correct
     precision += correct / N
 #    print averageOfEntropy
 #    print '{0}'.format(correct*100)
 #    print i
+    """
     print Y[i]
     import matplotlib.pyplot as plt
     from pylab import cm
     plt.imshow(X.reshape((X.shape[0],PICT_HEIGHT, PICT_WIDTH))[i], cmap=cm.gray)
     plt.show()
-
+    """
     i += 1
 print averageOfEntropy
 print precision

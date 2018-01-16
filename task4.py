@@ -57,7 +57,7 @@ b1 = np.random.normal(0.0, 1.0 / X_SIZE, (M_SIZE, 1))
 w2 = np.random.normal(0.0, 1.0 / M_SIZE, (CLASS_SIZE, M_SIZE))
 b2 = np.random.normal(0.0, 1.0 / M_SIZE, (CLASS_SIZE,1))
 
-filename = 'learningtest.npz'
+filename = 'learningRMSP.npz'
 if(os.path.exists(filename)):
     load_array = np.load(filename)
     w1 = load_array["w1"]

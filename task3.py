@@ -77,7 +77,7 @@ def backOfSig(x, deltaY):
 
 ########## ##########
 
-
+"""
 filename = 'learningtest.npz'
 if(os.path.exists(filename)):
     load_array = np.load(filename)
@@ -86,7 +86,7 @@ if(os.path.exists(filename)):
     w2 = load_array["w2"]
     b2 = load_array["b2"]
     load_array.close()
-
+"""
 
 count = 0
 precision = 0
@@ -128,4 +128,4 @@ while count <= (N / B_SIZE * 10) :
         precision = 0
     count += 1
 
-np.savez('learning4.npz', w1=w1, b1=b1, w2=w2, b2=b2)
+#np.savez('learning4.npz', w1=w1, b1=b1, w2=w2, b2=b2)

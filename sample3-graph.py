@@ -145,3 +145,6 @@ ax1.set_ylabel('cross entropy')
 ax2.set_ylabel('precision')
 plt.show()
 # np.savez('learning4.npz', w1=w1, b1=b1, w2=w2, b2=b2)
+
+#[ 0.17225823]
+#0.933583333333

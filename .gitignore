@@ -1,3 +1,11 @@
 /le4nn/
 *.npz
 !learningtest.npz
+/report/
+*.png
+!learning50.png
+!learning100.png
+*.db
+*.pyc
+*-graph.py
+!sample3-graph.py
