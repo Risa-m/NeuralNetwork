@@ -9,3 +9,7 @@
 *.pyc
 *-graph.py
 !sample3-graph.py
+/graph/
+/CNN/
+/convolution/
+result.txt

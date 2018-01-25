@@ -1,10 +1,8 @@
 import os.path
-from Graph import Graph
+from Convolution import Convolution
+from Convolution import Pooling
 import numpy as np
 from mnist import MNIST
-import time
-
-start = time.time()
 
 PICT_HEIGHT = 28
 PICT_WIDTH = 28
@@ -31,18 +29,12 @@ class Learning(object):
 
     def __init__(self):
         np.random.seed(200)
-        self.w1 = np.random.normal(0.0, 1.0 / Learning.X_SIZE, (M_SIZE, Learning.X_SIZE))
-        self.b1 = np.random.normal(0.0, 1.0 / Learning.X_SIZE, (M_SIZE, 1))
-        self.w2 = np.random.normal(0.0, 1.0 / M_SIZE, (CLASS_SIZE, M_SIZE))
-        self.b2 = np.random.normal(0.0, 1.0 / M_SIZE, (CLASS_SIZE,1))
 
-
-    # x is 10000 * 784 vector
     def inputLayer(self, x):
         return x
 
     def fullyConnecterLayer(self, x, w, b):
-        return np.dot(w, x.reshape(-1, 1)) + b
+        return np.dot(w, x) + b
 
     def sigmoid(self, x):
         sigmoid_range = 34.538776394910684
@@ -122,17 +114,10 @@ class Learning(object):
 
 if __name__ == '__main__':
     l = Learning()
-#    graph = Graph()
-    count = 0
-    precision = 0
-    inputX1 = np.empty((l.X_SIZE, B_SIZE))
-    inputX2 = np.empty((M_SIZE, B_SIZE))
-    deltaA = np.empty((CLASS_SIZE, B_SIZE))
-#    start = time.time()
     for count in xrange(l.N / B_SIZE * 21):
-#        print time.time() - start
-#        start = time.time()
-        minibatch = np.random.choice(l.N, B_SIZE)
+        
+
+
         averageOfEntropy = 0
         correct = 0
         j = 0

@@ -60,7 +60,7 @@ def crossEntropy(AnsY, y):
 #b1 = np.random.normal(0.0, 1.0 / X_SIZE, (M_SIZE, 1))
 #w2 = np.random.normal(0.0, 1.0 / M_SIZE, (CLASS_SIZE, M_SIZE))
 #b2 = np.random.normal(0.0, 1.0 / M_SIZE, (CLASS_SIZE,1))
-
+"""
 filename = 'learningMSGD.npz'
 if(os.path.exists(filename)):
     load_array = np.load(filename)
@@ -69,8 +69,9 @@ if(os.path.exists(filename)):
     w2 = load_array["w2"]
     b2 = load_array["b2"]
     load_array.close()
-
+"""
 ##########
+"""
 i = 100
 while i < 200:
     inputX = X[i] / 256.0
@@ -85,3 +86,13 @@ while i < 200:
     plt.imshow(X.reshape((X.shape[0],PICT_HEIGHT, PICT_WIDTH))[i], cmap=cm.gray)
     plt.show()
     i += 1
+"""
+
+import matplotlib.pyplot as plt
+from pylab import cm
+for j in xrange(10):
+    i = 200 + j * 10 
+    X = X.reshape(X.shape[0], 28, 28)
+    ppp = np.hstack(((X[i+0], X[i+1], X[i+2], X[i+3], X[i+4], X[i+5], X[i+6], X[i+7],X[i+8], X[i+9])))
+    plt.imshow(ppp, cmap=cm.gray)
+    plt.show()

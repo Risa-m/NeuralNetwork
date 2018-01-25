@@ -1,4 +1,5 @@
 import Learning as le
+from Graph import Graph
 import os.path
 import numpy as np
 from mnist import MNIST
@@ -18,8 +19,8 @@ class DropOut(le.Learning):
     def dropout(self, x):
         a = np.array([0] * RHO + [1] * (x.shape[0] - RHO))
         np.random.shuffle(a)
-        a = a.reshape(-1, 1)
-        t = x * a
+#        a = a.reshape(-1, 1)
+        t = x.ravel() * a
         return (t, a)
 
     def forward(self, x):
@@ -46,7 +47,7 @@ class DropOut(le.Learning):
 
     def test(self):
         correct = 0
-        for i in range(DropOut.p.shape[0]):
+        for i in xrange(DropOut.p.shape[0]):
             inputX = DropOut.p[i] / 256.0
             x, y1, y2 = self.forwardtest(inputX)
             correct = correct + (1.0 / DropOut.p.shape[0]) if(self.recogRes(y2)==DropOut.q[i]) else correct
@@ -55,31 +56,29 @@ class DropOut(le.Learning):
 
 if __name__ == '__main__':
     l = DropOut()
+    graph = Graph()
     count = 0
     precision = 0
-    while count <= (l.N / B_SIZE * 10) :
+    inputX1 = np.empty((l.X_SIZE, B_SIZE))
+    inputX2 = np.empty((M_SIZE, B_SIZE))
+    deltaA = np.empty((CLASS_SIZE, B_SIZE))
+    deltaDrop = np.empty((M_SIZE, B_SIZE))
+    for count in xrange(l.N / B_SIZE * l.Epoch_Size):
         minibatch = np.random.choice(l.N, B_SIZE)
         averageOfEntropy = 0
-        inputX1 = np.zeros(l.X_SIZE).reshape(-1, 1)
-        inputX2 = np.zeros(M_SIZE).reshape(-1, 1)
-        deltaA = np.zeros(CLASS_SIZE).reshape(-1, 1)
-        deltaDrop = np.zeros(M_SIZE).reshape(-1, 1)
         correct = 0
+        j = 0
         for i in minibatch:
             inputX = l.X[i] / 256.0
             x, y1, y2, a = l.forward(inputX)
             ansY = [0] * l.Y[i] + [1] + [0] * (10 - l.Y[i] - 1)
             averageOfEntropy += l.crossEntropy(ansY, y2) / B_SIZE
-            deltaDrop = np.hstack((deltaDrop, a))
-            deltaA = np.hstack((deltaA, l.backOfSoftAndCross(ansY, y2)))
-            inputX1 = np.hstack((inputX1, x))
-            inputX2 = np.hstack((inputX2, y1))
+            deltaDrop[:, j] = a
+            inputX1[:, j] = x
+            inputX2[:, j] = y1.ravel()
+            deltaA[:, j] = l.backOfSoftAndCross(ansY, y2)
             correct = correct + (1.0 / B_SIZE) if(l.recogRes(y2) == l.Y[i]) else correct
-        deltaA = np.delete(deltaA, 0, axis=1)
-        deltaDrop = np.delete(deltaDrop, 0, axis=1)
-        inputX2 = np.delete(inputX2, 0, axis=1)
-        inputX1 = np.delete(inputX1, 0, axis=1)
-
+            j += 1
         deltaW1, deltaB1, deltaW2, deltaB2 = l.backPropagate(inputX1, inputX2, deltaA, deltaDrop)
         l.renewParam(deltaW1, deltaB1, deltaW2, deltaB2)
 
@@ -90,5 +89,7 @@ if __name__ == '__main__':
             print averageOfEntropy
             print precision
             print testres
+            graph.graphAppend(count / (l.N / B_SIZE), np.sum(averageOfEntropy), precision, testres)
             precision = 0
         count += 1
+    graph.plot()

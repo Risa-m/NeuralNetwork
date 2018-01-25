@@ -1,10 +1,6 @@
 import os.path
-from Graph import Graph
 import numpy as np
 from mnist import MNIST
-import time
-
-start = time.time()
 
 PICT_HEIGHT = 28
 PICT_WIDTH = 28
@@ -14,7 +10,7 @@ B_SIZE = 100
 ETA = 0.01
 ########## ##########
 class Learning(object):
-    Epoch_Size = 21
+    Epoch_Size = 20
     mndata = MNIST("./le4nn/")
     X, Y = mndata.load_training()
     X = np.array(X)
@@ -39,10 +35,10 @@ class Learning(object):
 
     # x is 10000 * 784 vector
     def inputLayer(self, x):
-        return x
+        return x.reshape(-1, 1)
 
     def fullyConnecterLayer(self, x, w, b):
-        return np.dot(w, x.reshape(-1, 1)) + b
+        return np.dot(w, x) + b
 
     def sigmoid(self, x):
         sigmoid_range = 34.538776394910684
@@ -72,7 +68,7 @@ class Learning(object):
     ##########
 
     def backOfSoftAndCross(self, ansY, y):
-        return ((y.T - ansY) / B_SIZE)
+        return ((y.T - ansY) / B_SIZE).reshape(-1, 1)
 
     def backOfConnect(self, x, w, deltaY):
         deltaX = np.dot(w.T, deltaY)
@@ -122,43 +118,44 @@ class Learning(object):
 
 if __name__ == '__main__':
     l = Learning()
-#    graph = Graph()
     count = 0
     precision = 0
-    inputX1 = np.empty((l.X_SIZE, B_SIZE))
-    inputX2 = np.empty((M_SIZE, B_SIZE))
-    deltaA = np.empty((CLASS_SIZE, B_SIZE))
-#    start = time.time()
-    for count in xrange(l.N / B_SIZE * 21):
-#        print time.time() - start
-#        start = time.time()
+    for count in xrange(l.N / B_SIZE * l.Epoch_Size):
         minibatch = np.random.choice(l.N, B_SIZE)
         averageOfEntropy = 0
+        inputX1 = np.zeros(l.X_SIZE).reshape(-1, 1)
+        inputX2 = np.zeros(M_SIZE).reshape(-1, 1)
+        deltaA = np.zeros(CLASS_SIZE).reshape(-1, 1)
         correct = 0
-        j = 0
         for i in minibatch:
             inputX = l.X[i] / 256.0
             x, y1, y2 = l.forward(inputX)
             ansY = [0] * l.Y[i] + [1] + [0] * (10 - l.Y[i] - 1)
             averageOfEntropy += l.crossEntropy(ansY, y2) / B_SIZE
-            inputX1[:, j] = x
-            inputX2[:, j] = y1.ravel()
-            deltaA[:, j] = l.backOfSoftAndCross(ansY, y2)
+            deltaA = np.hstack((deltaA, l.backOfSoftAndCross(ansY, y2)))
+            inputX1 = np.hstack((inputX1, x))
+            inputX2 = np.hstack((inputX2, y1))
             correct = correct + (1.0 / B_SIZE) if(l.recogRes(y2) == l.Y[i]) else correct
-            j += 1
+        deltaA = np.delete(deltaA, 0, axis=1)
+        inputX2 = np.delete(inputX2, 0, axis=1)
+        inputX1 = np.delete(inputX1, 0, axis=1)
 
         deltaW1, deltaB1, deltaW2, deltaB2 = l.backPropagate(inputX1, inputX2, deltaA)
-        l.renewParam(deltaW1, deltaB1, deltaW2, deltaB2)
-        precision += correct / (l.N / B_SIZE)
+#        deltaX2, deltaW2, deltaB2 = l.backOfConnect(inputX2, l.w2, deltaA)
+#        deltaSig = l.backOfSig(inputX2, deltaX2)
+#        _, deltaW1, deltaB1 = l.backOfConnect(inputX1, l.w1, deltaSig)
 
+        l.renewParam(deltaW1, deltaB1, deltaW2, deltaB2)
+#        l.w1 -= (deltaW1 * ETA)
+#        l.b1 -= (deltaB1 * ETA)
+#        l.w2 -= (deltaW2 * ETA)
+#        l.b2 -= (deltaB2 * ETA)
+        precision += correct / (l.N / B_SIZE)
+    #    print averageOfEntropy
+    #    print '{0}'.format(correct*100)
         if (count % (l.N / B_SIZE)) == 0:
-            testres = l.test()
             print count / (l.N / B_SIZE)
             print averageOfEntropy
             print precision
-            print testres
-#            graph.graphAppend(count / (l.N / B_SIZE), np.sum(averageOfEntropy), precision, testres)
             precision = 0
         count += 1
-#    graph.plot()
-    print time.time() - start
