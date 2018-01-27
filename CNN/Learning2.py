@@ -1,8 +1,9 @@
 import os.path
-from Convolution import Convolution
-from Convolution import Pooling
+from Graph import Graph
 import numpy as np
 from mnist import MNIST
+import time
+
 
 PICT_HEIGHT = 28
 PICT_WIDTH = 28
@@ -29,7 +30,13 @@ class Learning(object):
 
     def __init__(self):
         np.random.seed(200)
+        self.w1 = np.random.normal(0.0, 1.0 / Learning.X_SIZE, (M_SIZE, Learning.X_SIZE))
+        self.b1 = np.random.normal(0.0, 1.0 / Learning.X_SIZE, (M_SIZE, 1))
+        self.w2 = np.random.normal(0.0, 1.0 / M_SIZE, (CLASS_SIZE, M_SIZE))
+        self.b2 = np.random.normal(0.0, 1.0 / M_SIZE, (CLASS_SIZE,1))
 
+
+    # x is 10000 * 784 vector
     def inputLayer(self, x):
         return x
 
@@ -42,8 +49,8 @@ class Learning(object):
         return 1 / (1 + np.exp(-x))
 
     def softmax(self, a):
-        alpha = max(a)
-        return np.exp(a - alpha) / np.sum(np.exp(a - alpha))
+        alpha = np.max(a, axis=0)
+        return np.exp(a - alpha) / np.sum(np.exp(a - alpha), axis=0)
 
     def recogRes(self, y):
         return np.argmax(y)
@@ -59,12 +66,12 @@ class Learning(object):
     ##########
 
     def crossEntropy(self, AnsY, y):
-        return np.dot(AnsY, np.log(y)) * -1
+        return np.sum(AnsY * np.log(y) * -1, axis=0)
 
     ##########
 
     def backOfSoftAndCross(self, ansY, y):
-        return ((y.T - ansY) / B_SIZE)
+        return ((y - ansY) / B_SIZE)
 
     def backOfConnect(self, x, w, deltaY):
         deltaX = np.dot(w.T, deltaY)
@@ -103,38 +110,41 @@ class Learning(object):
         np.savez('%s.npz' % filename, w1=self.w1, b1=self.b1, w2=self.w2, b2=self.b2)
 
     def test(self):
-        correct = 0
+        answer = np.array([Learning.q[i] for i in xrange(Learning.p.shape[0])])
+        testx = np.empty((Learning.X_SIZE, Learning.p.shape[0]))
         for i in xrange(Learning.p.shape[0]):
-            inputX = Learning.p[i] / 256.0
-            x, y1, y2 = self.forward(inputX)
-            correct = correct + (1.0 / Learning.p.shape[0]) if(self.recogRes(y2)==Learning.q[i]) else correct
+            testx[:,i] = Learning.p[i].ravel() / 256.0
+        x, y1, y2 = self.forward(testx)
+        recog = np.argmax(y2, axis=0)
+        correct = len(np.where(answer - recog == 0)[0]) * 1.0 / Learning.p.shape[0]
         return correct
 
 
 
 if __name__ == '__main__':
     l = Learning()
-    for count in xrange(l.N / B_SIZE * 21):
-        
-
-
-        averageOfEntropy = 0
+    graph = Graph()
+    count = 0
+    precision = 0
+    averageOfEntropy = 0
+    inputX1 = np.empty((l.X_SIZE, B_SIZE))
+    ansY = np.empty((CLASS_SIZE, B_SIZE))
+    for count in xrange(l.N / B_SIZE * 50 + 1):
+        choice = np.random.choice(l.N, B_SIZE)
         correct = 0
         j = 0
-        for i in minibatch:
-            inputX = l.X[i] / 256.0
-            x, y1, y2 = l.forward(inputX)
-            ansY = [0] * l.Y[i] + [1] + [0] * (10 - l.Y[i] - 1)
-            averageOfEntropy += l.crossEntropy(ansY, y2) / B_SIZE
-            inputX1[:, j] = x
-            inputX2[:, j] = y1.ravel()
-            deltaA[:, j] = l.backOfSoftAndCross(ansY, y2)
-            correct = correct + (1.0 / B_SIZE) if(l.recogRes(y2) == l.Y[i]) else correct
+        answer = np.array([l.Y[i] for i in choice])
+        for i in choice:
+            inputX1[:,j] = l.X[i].ravel() / 256.0
+            ansY[:,j] = np.array([0] * answer[j] + [1] + [0] * (10 - answer[j] - 1))
             j += 1
+        x, y1, y2 = l.forward(inputX1)
 
-        deltaW1, deltaB1, deltaW2, deltaB2 = l.backPropagate(inputX1, inputX2, deltaA)
+        deltaW1, deltaB1, deltaW2, deltaB2 = l.backPropagate(x, y1, l.backOfSoftAndCross(ansY, y2))
         l.renewParam(deltaW1, deltaB1, deltaW2, deltaB2)
-        precision += correct / (l.N / B_SIZE)
+        recog = np.argmax(y2, axis=0)
+        averageOfEntropy = np.sum(l.crossEntropy(ansY, y2)) / B_SIZE
+        precision += len(np.where(answer - recog == 0)[0]) * 1.0 / l.N
 
         if (count % (l.N / B_SIZE)) == 0:
             testres = l.test()
@@ -142,8 +152,7 @@ if __name__ == '__main__':
             print averageOfEntropy
             print precision
             print testres
-#            graph.graphAppend(count / (l.N / B_SIZE), np.sum(averageOfEntropy), precision, testres)
+            graph.graphAppend(count / (l.N / B_SIZE), np.sum(averageOfEntropy), precision, testres)
             precision = 0
         count += 1
-#    graph.plot()
-    print time.time() - start
+    graph.plot()

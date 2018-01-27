@@ -4,7 +4,6 @@ import numpy as np
 from mnist import MNIST
 import time
 
-start = time.time()
 
 PICT_HEIGHT = 28
 PICT_WIDTH = 28
@@ -27,15 +26,12 @@ class Learning(object):
     X_SIZE = X.shape[1]
     N = X.shape[0]
 
-
-
     def __init__(self):
         np.random.seed(200)
         self.w1 = np.random.normal(0.0, 1.0 / Learning.X_SIZE, (M_SIZE, Learning.X_SIZE))
         self.b1 = np.random.normal(0.0, 1.0 / Learning.X_SIZE, (M_SIZE, 1))
         self.w2 = np.random.normal(0.0, 1.0 / M_SIZE, (CLASS_SIZE, M_SIZE))
         self.b2 = np.random.normal(0.0, 1.0 / M_SIZE, (CLASS_SIZE,1))
-
 
     # x is 10000 * 784 vector
     def inputLayer(self, x):
@@ -98,7 +94,6 @@ class Learning(object):
     ########## ##########
 
     def importFile(self, filename):
-#        filename = 'learningtest.npz'
         if(os.path.exists("%s.npz" % filename)):
             load_array = np.load("%s.npz" % filename)
             self.w1 = load_array["w1"]
@@ -122,16 +117,12 @@ class Learning(object):
 
 if __name__ == '__main__':
     l = Learning()
-#    graph = Graph()
     count = 0
     precision = 0
     inputX1 = np.empty((l.X_SIZE, B_SIZE))
     inputX2 = np.empty((M_SIZE, B_SIZE))
     deltaA = np.empty((CLASS_SIZE, B_SIZE))
-#    start = time.time()
     for count in xrange(l.N / B_SIZE * 21):
-#        print time.time() - start
-#        start = time.time()
         minibatch = np.random.choice(l.N, B_SIZE)
         averageOfEntropy = 0
         correct = 0
@@ -152,13 +143,8 @@ if __name__ == '__main__':
         precision += correct / (l.N / B_SIZE)
 
         if (count % (l.N / B_SIZE)) == 0:
-            testres = l.test()
             print count / (l.N / B_SIZE)
             print averageOfEntropy
             print precision
-            print testres
-#            graph.graphAppend(count / (l.N / B_SIZE), np.sum(averageOfEntropy), precision, testres)
             precision = 0
         count += 1
-#    graph.plot()
-    print time.time() - start

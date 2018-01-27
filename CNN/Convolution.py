@@ -1,9 +1,6 @@
 from ReLU import ReLU
 import numpy as np
 from mnist import MNIST
-import ReLU
-import os.path
-
 
 stride = 1
 
@@ -64,19 +61,6 @@ class Convolution():
         deltaB = (np.sum(deltaY, axis=1)).reshape(-1,1)
         return (deltaX, deltaW, deltaB)
 
-
-        """
-    def filterToMatrixtest(self):
-        f1 = np.array([[1, 0, 1, 0, 1, 0, 1, 0, 1]])
-        f2 = np.array([[0, 0, 0, -1, 1, 0, 0, 0, 0]])
-        f3 = np.array([[0, 1, 0, 1, -4, 1, 0, 1, 0]])
-        f4 = np.array([[0, -1, 0, -1, 5, -1, 0, -1, 0]])
-        f12 = np.concatenate([f1, f2], axis=0)
-        f34 = np.concatenate([f3, f4], axis=0)
-        self.filter = np.concatenate([f12, f34], axis=0)
-        """
-
-
 if __name__ == '__main__':
     PICT_HEIGHT = 28
     PICT_WIDTH = 28
@@ -85,15 +69,6 @@ if __name__ == '__main__':
     B_SIZE = 100
     ETA = 0.01
     np.random.seed(200)
-
-    def fullyConnecterLayer(x, w, b):
-        return np.dot(w, x) + b
-
-    def backOfConnect(x, w, deltaY):
-        deltaX = np.dot(w.T, deltaY)
-        deltaW = np.dot(deltaY, x.T)
-        deltaB = (np.sum(deltaY, axis=1)).reshape(-1,1)
-        return (deltaX, deltaW, deltaB)
 
     def softmax(a):
         alpha = np.max(a, axis=0)
@@ -131,10 +106,11 @@ if __name__ == '__main__':
     b3 = np.random.normal(0.0, 1.0 / (M_SIZE), (CLASS_SIZE, 1))
 
     relu = ReLU.ReLU()
-    c1 = Convolution(PICT_HEIGHT, PICT_WIDTH, B_SIZE, R, k1)
+    c1 = co.Convolution(PICT_HEIGHT, PICT_WIDTH, B_SIZE, R, k1)
+    p1 = po.Pooling(d, PICT_HEIGHT, PICT_WIDTH, B_SIZE, k1)
     """
-    if(os.path.exists("convolution32-2.npz")):
-        load_array = np.load("convolution32-2.npz")
+    if(os.path.exists("convolution.npz")):
+        load_array = np.load("convolution.npz")
         w1 = load_array["w1"]
         b1 = load_array["b1"]
         w2 = load_array["w2"]
@@ -162,9 +138,9 @@ if __name__ == '__main__':
         for i in xrange(B_SIZE):
             x2[:,i] = t[i].ravel()
 
-        y2 = fullyConnecterLayer(x2, w2, b2 * (np.array([1] * B_SIZE)))
+        y2 = relu.fullyConnecterLayer(x2, w2, b2 * (np.array([1] * B_SIZE)))
         x3 = relu.relu(y2)
-        y4 = fullyConnecterLayer(x3, w3, b3 * (np.array([1] * B_SIZE)))
+        y4 = relu.fullyConnecterLayer(x3, w3, b3 * (np.array([1] * B_SIZE)))
         res = softmax(y4)
         averageOfEntropy = np.sum(crossEntropy(ansY, res)) / B_SIZE
         recog = np.argmax(res, axis=0)
@@ -195,41 +171,3 @@ if __name__ == '__main__':
 
 
 #    np.savez('convolution32-3.npz', w1=w1, b1=b1, w2=w2, b2=b2, w3=w3, b3=b3)
-
-
-
-"""
-    PICT_HEIGHT = 28
-    PICT_WIDTH = 28
-    R = 3
-    k = 4
-    d = 2
-    B_SIZE = 2
-
-    mndata = MNIST("./le4nn/")
-    X, Y = mndata.load_training()
-    X = np.array(X)
-    N = X.shape[0]
-    X = X.reshape((X.shape[0],PICT_HEIGHT, PICT_WIDTH))
-    Y = np.array(Y)
-    w1 = np.random.normal(0.0, 1.0 / (R * R), (k, R * R))
-    b1 = np.random.normal(0.0, 1.0 / (PICT_HEIGHT * PICT_WIDTH), (k, 1))
-
-    c = Convolution(PICT_HEIGHT, PICT_WIDTH, B_SIZE, R, k)
-    choice = np.random.choice(X.shape[0], B_SIZE)
-    batchset = np.empty((X.shape[1] , X.shape[2], B_SIZE))
-
-    j = 0
-    for i in choice:
-        batchset[:,:,j] = X[i]
-        j += 1
-    x1, y1 = c.convolution(batchset, w1, b1)
-
-    import matplotlib.pyplot as plt
-    from pylab import cm
-#    t = t.reshape((t.shape[0], PICT_HEIGHT, PICT_WIDTH, B_SIZE))
-#    t = np.hstack((t[0,:,:,1], t[1,:,:,1], t[2,:,:,1], t[3,:,:,1]))
-    plt.imshow(y1.reshape(28, 28), cmap=cm.gray)
-    plt.show()
-
-"""

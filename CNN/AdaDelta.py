@@ -1,4 +1,4 @@
-import Learning as le
+import Learning2 as le
 from Graph import Graph
 import os.path
 import numpy as np
@@ -40,6 +40,8 @@ class AdaDelta(le.Learning):
 
 if __name__ == '__main__':
     l = AdaDelta()
+    #Learning
+    """
     graph = Graph()
     count = 0
     precision = 0
@@ -76,3 +78,38 @@ if __name__ == '__main__':
             precision = 0
         count += 1
     graph.plot()
+    """
+    #Learning
+#    graph = Graph()
+    count = 0
+    precision = 0
+    averageOfEntropy = 0
+    inputX1 = np.empty((l.X_SIZE, B_SIZE))
+    ansY = np.empty((CLASS_SIZE, B_SIZE))
+    for count in xrange(l.N / B_SIZE * 50 + 1):
+        choice = np.random.choice(l.N, B_SIZE)
+        correct = 0
+        j = 0
+        answer = np.array([l.Y[i] for i in choice])
+        for i in choice:
+            inputX1[:,j] = l.X[i].ravel() / 256.0
+            ansY[:,j] = np.array([0] * answer[j] + [1] + [0] * (10 - answer[j] - 1))
+            j += 1
+        x, y1, y2 = l.forward(inputX1)
+
+        deltaW1, deltaB1, deltaW2, deltaB2 = l.backPropagate(x, y1, l.backOfSoftAndCross(ansY, y2))
+        l.renewParam(deltaW1, deltaB1, deltaW2, deltaB2)
+        recog = np.argmax(y2, axis=0)
+        averageOfEntropy = np.sum(l.crossEntropy(ansY, y2)) / B_SIZE
+        precision += len(np.where(answer - recog == 0)[0]) * 1.0 / l.N
+
+        if (count % (l.N / B_SIZE)) == 0:
+#            testres = l.test()
+            print count / (l.N / B_SIZE)
+            print averageOfEntropy
+            print precision
+#            print testres
+#            graph.graphAppend(count / (l.N / B_SIZE), np.sum(averageOfEntropy), precision, testres)
+            precision = 0
+        count += 1
+#    graph.plot()

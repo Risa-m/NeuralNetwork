@@ -14,7 +14,19 @@ class Graph:
         self.pr_height.append(learningPrecision)
         self.test_height.append(testPrecision)
 
+    def setData(self, xAxis, crossEntropy, learningPrecision, testPrecision):
+        self.xAxis = xAxis
+        self.ce_height = crossEntropy
+        self.pr_height = learningPrecision
+        self.test_height = testPrecision
+
+    def getData(self):
+        return (self.xAxis, self.ce_height, self.pr_height, self.test_height)
+
     def plot(self):
+        print self.ce_height
+        print self.pr_height
+        print self.test_height
         _, ax1 = plt.subplots()
         ax2 = ax1.twinx()
         p1 = ax1.plot(self.xAxis, self.ce_height, color="lightskyblue", label="Cross Entropy")

@@ -56,7 +56,7 @@ class DropOut(le.Learning):
 
 if __name__ == '__main__':
     l = DropOut()
-    graph = Graph()
+#    graph = Graph()
     count = 0
     precision = 0
     inputX1 = np.empty((l.X_SIZE, B_SIZE))
@@ -84,12 +84,12 @@ if __name__ == '__main__':
 
         precision += correct / (l.N / B_SIZE)
         if (count % (l.N / B_SIZE)) == 0:
-            testres = l.test()
+#            testres = l.test()
             print count / (l.N / B_SIZE)
             print averageOfEntropy
             print precision
-            print testres
-            graph.graphAppend(count / (l.N / B_SIZE), np.sum(averageOfEntropy), precision, testres)
+#            print testres
+#            graph.graphAppend(count / (l.N / B_SIZE), np.sum(averageOfEntropy), precision, testres)
             precision = 0
         count += 1
-    graph.plot()
+#    graph.plot()
